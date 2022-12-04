@@ -74,16 +74,30 @@ ejercicios indicados.
 - Inserte una imagen mostrando la dependencia entre los coeficientes 2 y 3 de las tres parametrizaciones
   para todas las señales de un locutor.
   
+  * LPC
+
+    ![Alt text](./img/lp.png?raw=true "Optional Title")
+
+  * LPCC 
+
+    ![Alt text](./img/lpcc.png?raw=true "Optional Title")
+
+  * MFCC
+
+    ![Alt text](./img/mfcc.png?raw=true "Optional Title")
+
   + Indique **todas** las órdenes necesarias para obtener las gráficas a partir de las señales 
     parametrizadas.
   + ¿Cuál de ellas le parece que contiene más información?
 
+    Si se observa detenidamente, se puede apreciar como tanto en el LPCC como en MFCC los coeficientes están mucho más dispersos. Se distribuyen por el espacio con una relación mucho menos aparente que en el caso de LPC. Dadas estas características, se puede entender que los coeficientes del LPC presentan una correlación más elevada (Dado que prácticamente forman una recta) por lo que la entropía es mucho menor. Es así como concluímos que el LPC es el que aporta menor información. 
+    En cuanto a la comparativa de MFCC vs LPCC, se observa como los coeficientes de MFCC tienen un rango mucho mayor (de 20/25) mientras que los valores del LPC se compactan entre -1 y 1. Es por eso que se entiende que los coeficientes del MFCC son los que presentan menor correlación y, por ende, mayor entropía.
 - Usando el programa <code>pearson</code>, obtenga los coeficientes de correlación normalizada entre los
   parámetros 2 y 3 para un locutor, y rellene la tabla siguiente con los valores obtenidos.
 
   |                        | LP   | LPCC | MFCC |
   |------------------------|:----:|:----:|:----:|
-  | &rho;<sub>x</sub>[2,3] |      |      |      |
+  | &rho;<sub>x</sub>[2,3] | -0.812152 | 0.257603 | 0.138085 |
   
   + Compare los resultados de <code>pearson</code> con los obtenidos gráficamente.
   
