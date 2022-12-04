@@ -33,16 +33,41 @@ ejercicios indicados.
   principal (`sox`, `$X2X`, `$FRAME`, `$WINDOW` y `$LPC`). Explique el significado de cada una de las 
   opciones empleadas y de sus valores.
 
+  * sox: Permite convertir una señal de audio en formato WAVE a una señal  sin cabeceras codificado como (-e) signed de (-b) 16 bits
+    *   -t : Tipo de fichero de salida
+    *   -e : Codificación a aplicar
+    *   -b : Nº Bits
+    *   -- : Redirigir Output 
+
+  * $X2X -> sptk x2x : Programa de SPTK que nos permite convertir datos de una entrada estándard a otro tipo de datos (+sf, short format en nuestro caso), enviando el resultado a una salida estándar. 
+
+  * Frame -> sptk frame: Programa de SPTK que permite convertir la señal a tramas de "l" muestras con desplazamientos de "p" muestras.En este caso la longitud es de 240 muestras y el periodo es de 80 muestras.
+
+  * Window -> sptk window:  Multiplica cada trama por la ventana escogida. Por defecto, la de Blackman. Existen 6 tipos más. La secuencia de entrada tiene una longitud -l y la salida una nueva longitud -L. Ambos con valores máximos de 256.Se define  una longitud de 240 muestras tanto para los datos de entrada como los de salida.
+
+  * LPC -> sptk lpc: Calcula los coeficientes LPC (predicción lineal) usando el método Levinson-Durbin. Se pueden fijar parámetros como la longitud del frame a 240 muestras y el orden del LPC. 
+
 - Explique el procedimiento seguido para obtener un fichero de formato *fmatrix* a partir de los ficheros de
   salida de SPTK (líneas 45 a 51 del script `wav2lp.sh`).
 
+    Entre las líneas 45 y 47 se calculan el número de filas y de columnas. Para las columnas, es relativamente sencillo pues solo debemos tener en cuenta el orden del LPC. Estas serán el orden + 1, ya que debemos tener en cuenta que se calcula la ganancia (la potencia del error). Para las filas, es más complicado, pues dependerá de los parámetros pasados en la llamada de las funciones en el pipeline. Para ello, extraemos la información del fichero base.lp (que contiene los coeficientes) y mediante sox realizamos la conversión a ASCII (fa) y se cuentan las líneas mediante wc -l.
+
   * ¿Por qué es más conveniente el formato *fmatrix* que el SPTK?
+
+    Es más conveniente el formato fmatrix dado que se puede acceder a los coeficientes de cada trama de una forma más sencillla y rápida. Esto es, ya que en formato matricial tenemos que los índices i,j de la matriz corresponden con el coeficiente i de la trama j.
 
 - Escriba el *pipeline* principal usado para calcular los coeficientes cepstrales de predicción lineal
   (LPCC) en su fichero <code>scripts/wav2lpcc.sh</code>:
 
+      sox $inputfile -t raw -e signed -b 16 - | $X2X +sf | $FRAME -l 240 -p 80 | $WINDOW -l 240 -L 240 |
+	  $LPC -l 240 -m $lpc_order | $LPCC -m $lpc_order -M $lpcc_order > $base.lpcc ||exit 1
+   
+
 - Escriba el *pipeline* principal usado para calcular los coeficientes cepstrales en escala Mel (MFCC) en su
   fichero <code>scripts/wav2mfcc.sh</code>:
+
+      sox $inputfile -t raw -e signed -b 16 - | $X2X +sf | $FRAME -l 240 -p 80 | $WINDOW -l 240 -L 240 |
+      $MFCC -l 240 -m $mfcc_order -n $filter_order -s $fq > $base.mfcc
 
 ### Extracción de características.
 
