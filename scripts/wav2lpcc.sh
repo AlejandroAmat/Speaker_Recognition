@@ -34,6 +34,7 @@ if [[ $UBUNTU_SPTK == 1 ]]; then
    FRAME="sptk frame"
    WINDOW="sptk window"
    LPC="sptk lpc"
+   LPCC="sptk lpc2c"
 else
    # or install SPTK building it from its source
    X2X="x2x"
