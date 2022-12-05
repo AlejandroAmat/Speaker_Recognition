@@ -86,22 +86,133 @@ ejercicios indicados.
 
     ![Alt text](./img/mfcc.png?raw=true "Optional Title")
 
+    * Código:
+
+    ```c
+    import matplotlib.pyplot as plt
+
+    # LP
+    X, Y = [], []
+    for line in open('./tables/lp.txt', 'r'):
+      values = [float(s) for s in line.split()]
+      X.append(values[0])
+      Y.append(values[1])
+    plt.figure(1)
+    plt.plot(X, Y, 'bd', markersize=1.5)
+    plt.title('Linear Prediction Coefficients',fontsize=15)
+    plt.grid()
+    plt.xlabel('a(2)')
+    plt.ylabel('a(3)')
+    plt.show()
+
+
+    # LPCC
+    X, Y = [], []
+    for line in open('./tables/lpcc.txt', 'r'):
+      values = [float(s) for s in line.split()]
+      X.append(values[0])
+      Y.append(values[1])
+    plt.figure(1)
+    plt.plot(X, Y, 'gd', markersize=1.5)
+    plt.title('Linear Prediction Cepstrum Coefficients',fontsize=15)
+    plt.grid()
+    plt.xlabel('a(2)')
+    plt.ylabel('a(3)')
+    plt.show()
+
+    # MFCC
+    X, Y = [], []
+    for line in open('./tables/mfcc.txt', 'r'):
+      values = [float(s) for s in line.split()]
+      X.append(values[0])
+      Y.append(values[1])
+    plt.figure(1)
+    plt.plot(X, Y, 'rd', markersize=1.5)
+    plt.title('Mel Frequency Cepstrum Coefficients',fontsize=15)
+    plt.grid()
+    plt.xlabel('a(2)')
+    plt.ylabel('a(3)')
+    plt.show()
+
+    ```
+
   + Indique **todas** las órdenes necesarias para obtener las gráficas a partir de las señales 
     parametrizadas.
+
+
+    * 1: Obtención ficheros .FEAT y directorio work:
+
+      * (i) run_spkid :
+
+        ```c
+        compute_lp() {
+            db=$1
+            shift
+            for filename in $(sort $*); do
+                mkdir -p `dirname $w/$FEAT/$filename.$FEAT`
+                EXEC="wav2lp 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+                echo $EXEC && $EXEC || exit 1
+            done
+        }
+        compute_lpcc(){
+            db=$1
+            shift
+            for filename in $(sort $*); do
+                mkdir -p `dirname $w/$FEAT/$filename.$FEAT`
+                EXEC="wav2lpcc 8 12 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+                echo $EXEC && $EXEC || exit 1
+            done
+        }
+
+        compute_mfcc(){
+            db=$1
+            shift
+            for filename in $(sort $*); do
+                mkdir -p `dirname $w/$FEAT/$filename.$FEAT`
+                EXEC="wav2mfcc 15 24 8 $db/$filename.wav $w/$FEAT/$filename.$FEAT"
+                echo $EXEC && $EXEC || exit 1
+            done
+        }
+        ```
+      * (ii) run del script para las 3 parametrizaciones:
+            
+            run_spkid mfcc
+            run_spkid lpcc
+            run_spkid lp
+             
+    * (2) Archivos txt de coeficientes 2,3:
+
+          fmatrix_show work/lp/BLOCK01/SES013/*.lp | egrep '^\[' | cut -f4,5 > ./tables/lp.txt
+
+          fmatrix_show work/lpcc/BLOCK01/SES013/*.lpcc | egrep '^\[' | cut -f4,5 > ./tables/lpcc.txt
+
+          fmatrix_show work/mfcc/BLOCK01/SES013/*.mfcc | egrep '^\[' | cut -f4,5 > ./tables/mfcc.txt
+
+    * (3) Gráficas
+
+          bin/python3 /home/alejandro/Desktop/CFIS/4A/PAV/P4/P4/tables/plot.py
+
   + ¿Cuál de ellas le parece que contiene más información?
 
     Si se observa detenidamente, se puede apreciar como tanto en el LPCC como en MFCC los coeficientes están mucho más dispersos. Se distribuyen por el espacio con una relación mucho menos aparente que en el caso de LPC. Dadas estas características, se puede entender que los coeficientes del LPC presentan una correlación más elevada (Dado que prácticamente forman una recta) por lo que la entropía es mucho menor. Es así como concluímos que el LPC es el que aporta menor información. 
     En cuanto a la comparativa de MFCC vs LPCC, se observa como los coeficientes de MFCC tienen un rango mucho mayor (de 20/25) mientras que los valores del LPC se compactan entre -1 y 1. Es por eso que se entiende que los coeficientes del MFCC son los que presentan menor correlación y, por ende, mayor entropía.
+
 - Usando el programa <code>pearson</code>, obtenga los coeficientes de correlación normalizada entre los
   parámetros 2 y 3 para un locutor, y rellene la tabla siguiente con los valores obtenidos.
 
   |                        | LP   | LPCC | MFCC |
   |------------------------|:----:|:----:|:----:|
-  | &rho;<sub>x</sub>[2,3] | -0.812152 | 0.257603 | 0.138085 |
+  | &rho;<sub>x</sub>[2,3] | -0.812152 | 0.257603 | -0.181939 |
   
   + Compare los resultados de <code>pearson</code> con los obtenidos gráficamente.
   
+    Como se ha comentado y teorizado previamente, los coeficientes con mayor correlación serían los de LP, seguidos de LPCC y MFCC. Tras observar los valores normalizados mediante pearson, se confirma. El valor del coeficiente de correlación normalizada para el lp en valor absoluto es el más grande de todos, llegando prácticamente a 1. En los otros dos casos, aún teniendo valores muy similares, se comprueba que la correlaciíon es menor para MFCC.
+
 - Según la teoría, ¿qué parámetros considera adecuados para el cálculo de los coeficientes LPCC y MFCC?
+
+    * Para LPCC se debe considerar un valor que aproximadamente sea 3/2 de P (orden del predictor lineal). EN nuestro caso, al tener P=8, Q=12. Aunque podemos probar con valores cercanos como 13 o 14.
+
+    * En el caso de MFCC, se debe tener en cuenta que normalmente se usan los 13 primeros coeficientes. Por lo que se ubica el umbral entre 13 y 18. Es por eso, que hemos escogido 16. Para el banco de filtros, se puede escoger entre 24 y 40 (Aún teniendo valores como 20 que pueden funcionar bien). La f es 8kHz.
 
 ### Entrenamiento y visualización de los GMM.
 

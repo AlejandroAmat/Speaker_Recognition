@@ -46,8 +46,7 @@ $MFCC -l 240 -m $mfcc_order -n $filter_order -s $fq > $base.mfcc
 
 # Our array files need a header with the number of cols and rows:
 ncol=$((mfcc_order)) # lpc p =>  (gain a1 a2 ... ap) 
-#nrow=`$X2X +fa < $base.lp | wc -l | perl -ne 'print $_/'$ncol', "\n";'` # `` Hace que se escriba en la posicion determinada
-nrow=$($X2X +fa < $base.mfcc | wc -l | perl -ne 'print $_/'$ncol', "\n";') #alternativa moderna de la linia superior
+nrow=$($X2X +fa < $base.mfcc | wc -l | perl -ne 'print $_/'$ncol', "\n";') 
 
 # Build fmatrix file by placing nrow and ncol in front, and the data after them
 echo $nrow $ncol | $X2X +aI > $outputfile
