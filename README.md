@@ -253,6 +253,21 @@ Complete el código necesario para realizar verificación del locutor y optimice
   de verificación de SPEECON. La tabla debe incluir el umbral óptimo, el número de falsas alarmas y de
   pérdidas, y el score obtenido usando la parametrización que mejor resultado le hubiera dado en la tarea
   de reconocimiento.
+  
+  Sistema MFCC con user:
+
+  | Th Opt | FalseAlarm | Missed | CostDetection |
+  |:----:|:----:|:----:|:----:|
+  | -0.00369532958170099 | 3/1000=0.0030 | 13/250=0.0520 | 7.9 |
+
+
+
+  Sistema LPCC con user:
+
+  | Th Opt | FalseAlarm | Missed | CostDetection |
+  |:----:|:----:|:----:|:----:|
+  | -0.117107543563996 | 9/1000=0.0090 | 21/250=0.0840 | 16.5 |
+
  
 ### Test final
 
