@@ -22,7 +22,7 @@ w=work
 name_exp=one
 db_devel=spk_8mu/speecon
 db_test=spk_8mu/sr_test
-
+world=users 
 # Ficheros de resultados del reconocimiento y verificación
 LOG_CLASS=$w/class_${FEAT}_${name_exp}.log
 LOG_VERIF=$w/verif_${FEAT}_${name_exp}.log
@@ -158,7 +158,7 @@ for cmd in $*; do
        # Implement 'trainworld' in order to get a Universal Background Model for speaker verification
        #
        # - The name of the world model will be used by gmm_verify in the 'verify' command below.
-       echo "Implement the trainworld option ..."
+       gmm_train -v 1 -T 0.000001 -N 60 -m 64 -d $w/$FEAT -e $FEAT -g $w/gmm/$FEAT/$world.gmm $lists/verif/$world.train || exit 1
 
    elif [[ $cmd == verify ]]; then
        ## @file
@@ -179,7 +179,7 @@ for cmd in $*; do
        fi
        # You can pass the threshold to spk_verif_score.pl or it computes the
        # best one for these particular results.
-       pk_verif_score $TEMP_VERIF | tee -a $LOG_VERIF
+       spk_verif_score $TEMP_VERIF | tee -a $LOG_VERIF
 
 
 
@@ -192,8 +192,11 @@ for cmd in $*; do
        #
        # El fichero con el resultado del reconocimiento debe llamarse $FINAL_CLASS, que deberá estar en el
        # directorio de la práctica (PAV/P4).
-       echo "To be implemented ..."
-   
+       
+       #(gmm_classify -d $w/$FEAT -e $FEAT -D $w/gmm/$FEAT -E gmm $lists/gmm.list $lists/final/class.test | tee FINAL_CLASS) || exit 1
+        EXEC="compute_$FEAT $db_final $lists/final/class.test"
+       echo $EXEC && $EXEC || exit 1
+
    elif [[ $cmd == finalverif ]]; then
        ## @file
        # \TODO
